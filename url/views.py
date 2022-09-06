@@ -11,28 +11,13 @@ from rest_framework.views import APIView
 from .serializers import URLMapSerializer
 from django.utils.decorators import method_decorator
 import logging
+from utils import generate_log
 
 logger = logging.getLogger('my_logger')
 
 characters = [chr(i) for i in range(65, 123) if i not in range(91, 97)]
 digits = [str(i) for i in range(1, 10)]
 characters.extend(digits)
-
-def generate_log(request, status_code='', response=''):
-    method = request.method
-    ip, _ = get_client_ip(request)
-    os = request.method.os.family
-    end_point = request.get_absolute.uri()
-    browser = request.users_agent.browser.family
-
-    log_info = {
-        'url': end_point,
-        'request_method': method,
-        'user_ip': ip,
-        'operating_system': os,
-        'browser': browser,
-    }
-    return log_info
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LongURLView(CreateAPIView):
@@ -51,22 +36,22 @@ class LongURLView(CreateAPIView):
                 try:
                     url_map = URLMap.objects.get(long_url=long_url, owner=user)
                     response = {'alias': url_map.alias, 'short_url': url_map.get_short_url(request)}
-                    logger.debug(generate_log(request), 200, response)
+                    logger.debug(generate_log(request, 200))
                     return JsonResponse(response)
                 except:
                     url_map.owner = user
                     url_map.save()
                     response = {'alias': url_map.alias, 'short_url': url_map.get_short_url(request)}
-                    logger.debug(generate_log(request), 200, response)
+                    logger.debug(generate_log(request, 200))
                     return JsonResponse(response)
             else:
                 url_map.save()
                 response = {'alias': url_map.alias, 'short url': url_map.get_short_url(request)}
-                logger.debug(generate_log(request), 200, response)
+                logger.debug(generate_log(request, 200))
                 return JsonResponse(response)
         except:
             response = {'status': 'Failed', 'message': 'Something went wrong'}
-            logger.debug(generate_log(request), 400, response)
+            logger.debug(generate_log(request, 400))
             return JsonResponse(response, status=400)
     
 
@@ -85,3 +70,4 @@ class ShortURLView(APIView):
         url_map.save()
         logger.debug(generate_log(request))
         return redirect(long_url)
+
