@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
 from pathlib import Path
+import os
+import logging
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -148,5 +150,33 @@ REST_FRAMEWORK = { 'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoS
                        'rest_framework.parsers.MultiPartParser',
                        'rest_framework.parsers.JSONParser',
                     ]
-                 }
+}
+
+# LOGGING SETTING
+
+LOGGING = {
+    'version': 1,                       # the dictConfig format version
+    'disable_existing_loggers': False,  # retain the default loggers
+    
+    'formatters': {
+        'verbose': {
+            'format': '{name} {levelname} {module}',
+            'style': '{',
+        },
+    },
+
+    'handlers': {
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'app_logs.log',
+        },
+    },
+
+    'loggers': {
+        'my_logger': {
+            'level': 'DEBUG',
+            'handlers': ['file'],
+        },
+    },
+}
 
